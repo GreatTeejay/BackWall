@@ -987,8 +987,9 @@ update_script() {
         if head -n 20 "$tmp" | grep -q "BackWall"; then
             install -m 0755 "$tmp" "$INSTALL_PATH"
             rm -f "$tmp"
-            colorize green "Updated successfully. Run 'backwall' to start." bold
-            exit 0
+            colorize green "Updated successfully. Restarting..." bold
+            sleep 1
+            exec "$INSTALL_PATH"
         else
             colorize red "Downloaded file does not look valid. Aborting."
         fi
@@ -1027,14 +1028,18 @@ display_menu() {
     display_server_info
     display_core_status
     echo
-    echo -e "   \033[1;32m1\033[0m  Configure a new tunnel"
-    echo -e "   \033[1;33m2\033[0m  Tunnel management"
-    echo -e "   \033[1;36m3\033[0m  Check tunnel status"
-    echo -e "   \033[0;37m4\033[0m  Update ${BRAND} core"
-    echo -e "   \033[0;37m5\033[0m  Update script"
-    echo -e "   \033[0;31m6\033[0m  Remove ${BRAND} core"
-    echo -e "   \033[0;90m0\033[0m  Exit"
-    _divider
+    echo -e "   \033[0;90m┌───────────────────────────────────────┐\033[0m"
+    printf  "   \033[0;90m│\033[0m   \033[1;32m%s)\033[0m %-33s\033[0;90m│\033[0m\n" "1" "Configure a new tunnel"
+    printf  "   \033[0;90m│\033[0m   \033[1;33m%s)\033[0m %-33s\033[0;90m│\033[0m\n" "2" "Tunnel management"
+    printf  "   \033[0;90m│\033[0m   \033[1;36m%s)\033[0m %-33s\033[0;90m│\033[0m\n" "3" "Check tunnel status"
+    echo -e "   \033[0;90m├───────────────────────────────────────┤\033[0m"
+    printf  "   \033[0;90m│\033[0m   \033[0;37m%s)\033[0m %-33s\033[0;90m│\033[0m\n" "4" "Update ${BRAND} core"
+    printf  "   \033[0;90m│\033[0m   \033[0;37m%s)\033[0m %-33s\033[0;90m│\033[0m\n" "5" "Update script"
+    printf  "   \033[0;90m│\033[0m   \033[0;31m%s)\033[0m %-33s\033[0;90m│\033[0m\n" "6" "Remove ${BRAND} core"
+    echo -e "   \033[0;90m├───────────────────────────────────────┤\033[0m"
+    printf  "   \033[0;90m│\033[0m   \033[0;90m%s)\033[0m %-33s\033[0;90m│\033[0m\n" "0" "Exit"
+    echo -e "   \033[0;90m└───────────────────────────────────────┘\033[0m"
+    echo
 }
 
 read_option() {
