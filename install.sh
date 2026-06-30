@@ -30,4 +30,15 @@ install -m 0755 "$tmp" "$DEST"
 rm -f "$tmp"
 
 echo "Installed to $DEST"
-echo "Run it with:  backwall"
+echo "Launching BackWall..."
+sleep 1
+
+# Launch the script right away with the terminal reattached to stdin.
+# (When installed via  bash <(curl ...)  stdin is the pipe, not the
+# keyboard, so we redirect it back to the controlling TTY so the menu
+# can read your key presses.) You can re-open it any time: backwall
+if [[ -e /dev/tty ]]; then
+    exec "$DEST" < /dev/tty
+else
+    echo "Run it with:  backwall"
+fi
