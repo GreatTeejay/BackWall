@@ -121,5 +121,3 @@ laws and the terms of service of your providers.
 ## License
 
 MIT — see [LICENSE](LICENSE).
-
-Telegram: **@GreatTeejay**
