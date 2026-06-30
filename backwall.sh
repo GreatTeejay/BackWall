@@ -18,7 +18,8 @@ set -o pipefail
 # ────────────────────────────────────────────────────────────────
 #  Global configuration (override via environment variables)
 # ────────────────────────────────────────────────────────────────
-SCRIPT_VERSION="v2.0.0"
+SCRIPT_VERSION="1.0.0"
+CORE_VERSION="1.0.0"
 BRAND="BackWall"
 BRAND_EDITION="Teejay Edition"
 
@@ -39,9 +40,6 @@ KEY_FILE="$CERT_DIR/cert.key"
 CORE_BIN="${config_dir}/backwall_core"
 SERVICE_PREFIX="backwall"
 INSTALL_PATH="/usr/local/bin/backwall"
-
-# Telegram / contact (purely cosmetic)
-TELEGRAM_CHANNEL="@GreatTeejay"
 
 mkdir -p "$CERT_DIR"
 
@@ -747,38 +745,48 @@ SERVER_COUNTRY=$(jq -r '.country // "Unknown"' <<< "$_IPINFO" 2>/dev/null)
 SERVER_ISP=$(jq -r '.isp // "Unknown"' <<< "$_IPINFO" 2>/dev/null)
 
 display_logo() {
-    echo -e "\033[36m"
+    echo -e "\033[1;36m"
     cat << "EOF"
- ____             _    __        __      _ _
-| __ )  __ _  ___| | _ \ \      / /_ _  | | |
-|  _ \ / _` |/ __| |/ /  \ \ /\ / / _` | | | |
-| |_) | (_| | (__|   <    \ V  V / (_| | | | |
-|____/ \__,_|\___|_|\_\    \_/\_/ \__,_| |_|_|
-        Lightning-fast reverse tunneling
+   ╭───────────────────────────────────────────────╮
+   │   ____             _    __        __       _ _  │
+   │  | __ )  __ _  ___| | _ \ \      / /__ _  | | | │
+   │  |  _ \ / _` |/ __| |/ /  \ \ /\ / / _` | | | | │
+   │  | |_) | (_| | (__|   <    \ V  V / (_| | | | | │
+   │  |____/ \__,_|\___|_|\_\    \_/\_/ \__,_| |_|_| │
+   ╰───────────────────────────────────────────────╯
 EOF
-    echo -e "\033[0m\033[32m"
-    echo -e "Edition: \033[33m${BRAND_EDITION}\033[32m"
-    echo -e "Script Version: \033[33m${SCRIPT_VERSION}\033[32m"
-    if [[ -f "$CORE_BIN" ]]; then
-        echo -e "Core Version: \033[33m$("$CORE_BIN" -v 2>/dev/null || echo 'n/a')\033[32m"
-    fi
-    echo -e "Telegram: \033[33m${TELEGRAM_CHANNEL}\033[0m"
+    echo -e "\033[0m"
+    echo -e "        \033[2;37mLightning-fast reverse tunneling\033[0m"
+    echo -e "                \033[1;35m• ${BRAND_EDITION} •\033[0m"
+}
+
+# Print one aligned info row:  label (cyan, padded) : value
+_info_row() {
+    local label="$1" value="$2" value_color="${3:-\033[0;37m}"
+    printf "   \033[1;36m%-14s\033[0m ${value_color}%s\033[0m\n" "$label" "$value"
+}
+
+_divider() {
+    echo -e "   \033[0;90m─────────────────────────────────────────────\033[0m"
 }
 
 display_server_info() {
-    echo -e "\e[93m═══════════════════════════════════════════\e[0m"
-    echo -e "\033[36mIP Address:\033[0m $SERVER_IP"
-    echo -e "\033[36mLocation:\033[0m   $SERVER_COUNTRY"
-    echo -e "\033[36mDatacenter:\033[0m $SERVER_ISP"
+    _divider
+    _info_row "Script ver." "$SCRIPT_VERSION"   "\033[1;33m"
+    _info_row "Core ver."   "$CORE_VERSION"     "\033[1;33m"
+    _divider
+    _info_row "IP Address"  "$SERVER_IP"
+    _info_row "Location"    "$SERVER_COUNTRY"
+    _info_row "Datacenter"  "$SERVER_ISP"
 }
 
 display_core_status() {
     if [[ -f "$CORE_BIN" ]]; then
-        echo -e "\033[36m${BRAND} Core:\033[0m \033[32mInstalled\033[0m"
+        _info_row "Core status" "● Installed" "\033[1;32m"
     else
-        echo -e "\033[36m${BRAND} Core:\033[0m \033[31mNot installed\033[0m"
+        _info_row "Core status" "● Not installed" "\033[1;31m"
     fi
-    echo -e "\e[93m═══════════════════════════════════════════\e[0m"
+    _divider
 }
 
 # ────────────────────────────────────────────────────────────────
@@ -1019,14 +1027,14 @@ display_menu() {
     display_server_info
     display_core_status
     echo
-    colorize green " 1. Configure a new tunnel" bold
-    colorize red   " 2. Tunnel management" bold
-    colorize cyan  " 3. Check tunnel status" bold
-    echo           " 4. Update ${BRAND} core"
-    echo           " 5. Update script"
-    echo           " 6. Remove ${BRAND} core"
-    echo           " 0. Exit"
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo -e "   \033[1;32m1\033[0m  Configure a new tunnel"
+    echo -e "   \033[1;33m2\033[0m  Tunnel management"
+    echo -e "   \033[1;36m3\033[0m  Check tunnel status"
+    echo -e "   \033[0;37m4\033[0m  Update ${BRAND} core"
+    echo -e "   \033[0;37m5\033[0m  Update script"
+    echo -e "   \033[0;31m6\033[0m  Remove ${BRAND} core"
+    echo -e "   \033[0;90m0\033[0m  Exit"
+    _divider
 }
 
 read_option() {
