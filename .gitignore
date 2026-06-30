@@ -1,0 +1,15 @@
+# Core binary is distributed via GitHub Releases, never committed
+backwall_core
+backwall_premium
+*.tar.gz
+
+# Runtime artifacts
+*.toml
+cert_files/
+*.crt
+*.key
+
+# Editor / OS noise
+*.swp
+*~
+.DS_Store
